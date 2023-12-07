@@ -4,6 +4,7 @@ services:
   backend:
     volumes:
       - ./backend/src:/app/src
+      - ./shared:/app/src/shared
       - dist_2:/app/dist
     build:
       context: ./backend
@@ -17,6 +18,7 @@ services:
   frontend:
     volumes:
       - ./frontend/src:/app/src
+      - ./shared:/app/src/shared
       - ./frontend/public:/app/public
       - dist_2:/app/dist
     build:

@@ -1,17 +1,3 @@
-export interface ServerToClientEvents {
-	ping: (n) => void;
-	join: (id: string) => void;
-	update: (data: DataUpdate) => void;
-}
-
-export interface ClientToServerEvents {
-	ping: (n) => void;
-	join: () => void;
-	move: (dataMove: DataMove) => void;
-	ballTouched: (id: string) => void;
-	ballOut: (id: string) => void;
-}
-
 export interface DataMove {
 	direction: number;
 	id: string;
@@ -26,10 +12,11 @@ export interface DataUpdate {
 
 export interface DataBall {
 	x: number;
-	vx: number;
 	y: number;
+	vx: number;
 	vy: number;
 	r: number;
+	kickoff: boolean;
 }
 
 export interface DataPlayer {
