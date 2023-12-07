@@ -4,6 +4,7 @@ ENV_FILE			= .env
 all: up
 
 up:
+	echo "HOST=$$(hostname)" >> $(ENV_FILE)
 	@if [ -e $(ENV_FILE) ]; then \
 		echo "docker compose up"; \
 		docker compose -f $(DOCKER_COMPOSE_FILE) --env-file $(ENV_FILE) up --build; \
