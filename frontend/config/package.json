@@ -1,0 +1,16 @@
+{
+  "name": "chat-demo-frontend",
+  "version": "0.0.1",
+  "description": "",
+  "author": "",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "start:dev": "export HOST && webpack --mode development --config webpack.config.js --watch",
+    "start": "export HOST && webpack --mode production --config webpack.config.js"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}
