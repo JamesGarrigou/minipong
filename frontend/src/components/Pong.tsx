@@ -7,6 +7,7 @@ import {
 import { board, paddle } from '../shared/config/pong.config';
 import Board from './Board/Board';
 import Scoreboard from './Scoreboard/Scoreboard';
+import './Pong.css';
 
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://${process.env.HOST}:8001`);
 
@@ -125,8 +126,8 @@ export default class Pong extends React.Component {
 
 	render() {
 		return (
-			<>
-				<p>URL: {process.env.HOST}:3030</p>
+			<div className="Pong">
+				<p id="url">URL: {process.env.HOST}:3030</p>
 				<Scoreboard
 					ping={this.state.ping}
 					player1={this.state.player1}
@@ -139,7 +140,7 @@ export default class Pong extends React.Component {
 					ballTouchPaddle={this.ballTouchPaddle}
 					ballOffLimit={this.ballOffLimit}
 				/>
-			</>
+			</div>
 		);
 	}
 }

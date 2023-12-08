@@ -30,10 +30,14 @@ export class PongGateway {
 
 	updatePlayer(player, dt) {
 		player.y += player.vy * dt;
-		if (player.y < 0)
-			player.vy = 0, player.y = 0;
-		if (player.y - paddle.height > board.width)
-			player.vy = 0, player.y = board.height - paddle.height;
+		if (player.y < 0) {
+			player.vy = 0;
+			player.y = 0;
+		}
+		if (player.y + paddle.height > board.height) {
+			player.vy = 0;
+			player.y = board.height - paddle.height;
+		}
 	}
 
 	updateBall(ball, dt) {

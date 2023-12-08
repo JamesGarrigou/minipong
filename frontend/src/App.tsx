@@ -1,4 +1,5 @@
-import React from 'react'; import Pong from './components/Pong';
+import React from 'react';
+import Pong from './components/Pong';
 
 export default function App() {
 	return (
