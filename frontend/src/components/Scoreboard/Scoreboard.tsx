@@ -35,7 +35,7 @@ export default class Scoreboard extends React.Component {
 		ctx.fill();
 
 		// Draw ping
-		ctx.font = "14px serif";
+		ctx.font = "14px helvetica";
 		ctx.fillStyle = "grey";
 		ctx.fillText(
 			`${ping.latency}ms`.padStart(5, ' '),
@@ -49,7 +49,7 @@ export default class Scoreboard extends React.Component {
 			? scoreboard.width / 4 - fontsize / 2
 			: 3 * scoreboard.width / 4 - fontsize / 2;
 
-		ctx.font = `${fontsize}px serif`;
+		ctx.font = `${fontsize}px helvetica`;
 		ctx.fillStyle = "white";
 		ctx.fillText(`${player.score}`, x, (scoreboard.height + fontsize) / 2);
 	}
@@ -60,7 +60,7 @@ export default class Scoreboard extends React.Component {
 		const offset1 = scoreboard.width / 3 + fontsize / 2;
 		const offset2 = 2 * scoreboard.width / 3 + fontsize / 2;
 
-		ctx.font = `${fontsize}px serif`;
+		ctx.font = `${fontsize}px helvetica`;
 		ctx.fillStyle = "white";
 		ctx.fillText("🆆", margin, offset1);
 		ctx.fillText("🆂", margin, offset2);
@@ -69,7 +69,7 @@ export default class Scoreboard extends React.Component {
 	}
 
 	clearCanvas(ctx) {
-		ctx.fillStyle = "rgb(0, 0, 255)"
+		ctx.fillStyle = "rgb(55, 55, 55)"
 		ctx.fillRect(0, 0, scoreboard.width, scoreboard.height);
 	}
 

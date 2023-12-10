@@ -4,3 +4,9 @@
 	margin-right: auto;
 	background-color: rgb(0,255,0);
 }
+
+body {
+  background: dimgray;
+  color: #fff;
+  font-family: sans-serif;
+}
