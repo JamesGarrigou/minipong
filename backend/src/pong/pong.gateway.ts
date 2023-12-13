@@ -52,12 +52,14 @@ export class PongGateway {
 			ball.vy = -ball.vy;
 	}
 
-	updateData(data) {
-		const dt = (new Date().getTime() - data.t.getTime()) * 60 / 1000;
+	updateData(data): number {
+		const newT = new Date();
+		const dt = (newT.getTime() - data.t.getTime()) / 1000;
 		this.updatePlayer(data.player1, dt);
 		this.updatePlayer(data.player2, dt);
 		this.updateBall(data.ball, dt);
-		data.t = new Date();
+		data.t = newT;
+		return (dt);
 	}
 
 	@SubscribeMessage('move')
@@ -68,7 +70,7 @@ export class PongGateway {
 		if (this.id < 3)
 			return ;
 		const player = (dataMove.id === "1") ? this.data.player1 : this.data.player2;
-		const newSpeed = 5 * Math.sign(dataMove.direction);
+		const newSpeed = 300 * Math.sign(dataMove.direction);
 
 		this.updateData(this.data);
 		player.vy = newSpeed;
@@ -98,10 +100,10 @@ export class PongGateway {
 
 		if (ballGoneLeft)
 			this.data.player2.score += 1,
-			this.launchBall(ball, 2);
+			this.launchBall(ball, 150);
 		if (ballGoneRight)
 			this.data.player1.score += 1,
-			this.launchBall(ball, -2);
+			this.launchBall(ball, -150);
 		this.server.emit('update', this.data);
 	}
 
@@ -121,22 +123,22 @@ export class PongGateway {
 		return (boundedUp && boundedDown && boundedLeft && boundedRight);
 	}
 
-	reflectBall(ball, player) {
+	reflectBall(ball, player, dt) {
 		if (!this.ballTouchPaddle(ball, player))
 			return ;
 		var v = Math.hypot(ball.vx, ball.vy);
 		const relativePos = ball.y - player.y - paddle.height / 2;
 		var theta = relativePos / (paddle.height + ball.r) * Math.PI / 2;
 
+		ball.x = paddle.margin + paddle.width + ball.r;
 		if (player.position === 1)
-			theta = -theta + Math.PI;
+			theta = -theta + Math.PI,
+			ball.x = board.width - paddle.margin - paddle.width - ball.r;
 		if (ball.kickoff)
-			v = 4, ball.kickoff = false;
+			v = 250, ball.kickoff = false;
 		v *= 1.02;
 		ball.vx = v * Math.cos(theta);
 		ball.vy = v * Math.sin(theta);
-		ball.x += ball.vx;
-		ball.y += ball.vy;
 	}
 
 	@SubscribeMessage('ballTouchPaddle')
@@ -148,8 +150,8 @@ export class PongGateway {
 			return ;
 		const player = (id === "1") ? this.data.player1 : this.data.player2;
 
-		this.updateData(this.data);
-		this.reflectBall(this.data.ball, player);
+		const dt = this.updateData(this.data);
+		this.reflectBall(this.data.ball, player, dt);
 		this.server.emit('update', this.data);
 	}
 
@@ -157,6 +159,8 @@ export class PongGateway {
 	handleEventJoin(
 		@ConnectedSocket() client: Socket
 	): void {
+		if (this.id >= 3)
+			return ;
 		client.emit('join', `${this.id}`);
 		this.id += 1;
 		if (this.id < 3)
@@ -168,7 +172,7 @@ export class PongGateway {
 			ball: {
 				x: board.width / 2,
 				y: board.height / 2,
-				vx: 2,
+				vx: 150,
 				vy: 0,
 				r: 10,
 				kickoff: true,

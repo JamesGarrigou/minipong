@@ -5,6 +5,9 @@ import './Board.css';
 export default class Board extends React.Component {
 	constructor(props) {
 		super(props);
+		this.state = {
+			t: new Date(),
+		};
 		var raf;
 	}
 
@@ -28,32 +31,34 @@ export default class Board extends React.Component {
 		return (boundedUp && boundedDown && boundedLeft && boundedRight);
 	}
 
-	reflectBall(ball, player) {
+	reflectBall(ball, player, dt) {
 		var v = Math.hypot(ball.vx, ball.vy);
 		const relativePos = ball.y - player.y - paddle.height / 2;
 		var theta = relativePos / (paddle.height + ball.r) * Math.PI / 2;
 
+		ball.x = paddle.margin + paddle.width + ball.r;
 		if (player.position === 1)
-			theta = -theta + Math.PI;
+			theta = -theta + Math.PI,
+			ball.x = board.width - paddle.margin - paddle.width - ball.r;
 		if (ball.kickoff)
-			v = 4, ball.kickoff = false;
+			v = 250, ball.kickoff = false;
 		v *= 1.02;
 		ball.vx = v * Math.cos(theta);
 		ball.vy = v * Math.sin(theta);
-		ball.x += ball.vx;
-		ball.y += ball.vy;
+		ball.x += ball.vx * dt;
+		ball.y += ball.vy * dt;
 	}
 
-	manageBallTouchPaddle(ball, player1, player2) {
+	manageBallTouchPaddle(ball, player1, player2, dt) {
 		var theta;
 
 		if (this.ballTouchPaddle(ball, player1)) {
 			this.props.ballTouchPaddle("1");
-			this.reflectBall(ball, player1);
+			this.reflectBall(ball, player1, dt);
 		}
 		if (this.ballTouchPaddle(ball, player2)) {
 			this.props.ballTouchPaddle("2");
-			this.reflectBall(ball, player2);
+			this.reflectBall(ball, player2, dt);
 		}
 	}
 
@@ -87,15 +92,15 @@ export default class Board extends React.Component {
 		}
 	}
 
-	updateBall(ball, player1, player2) {
-		ball.x += ball.vx;
-		ball.y += ball.vy;
-		this.manageBallTouchPaddle(ball, player1, player2);
+	updateBall(ball, player1, player2, dt) {
+		ball.x += ball.vx * dt;
+		ball.y += ball.vy * dt;
+		this.manageBallTouchPaddle(ball, player1, player2, dt);
 		this.manageBallOffLimits(ball);
 	}
 
-	updatePaddle(player) {
-		player.y += player.vy;
+	updatePaddle(player, dt) {
+		player.y += player.vy * dt;
 		if (player.y < 0) {
 			player.y = 0;
 			player.vy = 0;
@@ -107,13 +112,16 @@ export default class Board extends React.Component {
 	}
 
 	update() {
-		this.updateBall(this.props.ball, this.props.player1, this.props.player2);
-		this.updatePaddle(this.props.player1);
-		this.updatePaddle(this.props.player2);
+		const newT = new Date();
+		const dt = (newT.getTime() - this.state.t.getTime()) / 1000;
+		this.updateBall(this.props.ball, this.props.player1, this.props.player2, dt);
+		this.updatePaddle(this.props.player1, dt);
+		this.updatePaddle(this.props.player2, dt);
+		this.state.t = newT;
 	}
 
 	createGradientDragEffect(ball, drag, v, ctx) {
-		const lowSpeedFilter = 0.5 * v * v / (200 + v * v) + 0.5 * v / (50 + v);
+		const lowSpeedFilter = 0.5 * v * v / (board.width * board.width + v * v) + 0.5 * v / (4 * board.width + v);
 		const gradient = ctx.createRadialGradient(0, 0, ball.r / 2, 0, 0, drag);
 
 		gradient.addColorStop(0, `rgba(255, 100, 255, ${lowSpeedFilter})`);
@@ -125,7 +133,7 @@ export default class Board extends React.Component {
 		const theta = Math.atan2(-ball.vy, -ball.vx);
 		const v = this.norm(ball.vx, ball.vy);
 		const ballColor = "rgb(255,0,255)";
-		const drag = ball.r + 3 * v;
+		const drag = ball.r + 3 * v / 60;
 		const gradient = this.createGradientDragEffect(ball, drag, v, ctx);
 
 		// Draw drag effect
